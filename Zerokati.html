@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>💕 Tic Tac Toe</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ffe6ee, #e6f7ff);
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 38px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        #status {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        /* Game Board */
+
+        .game {
+            width: 330px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .cell {
+            width: 103px;
+            height: 103px;
+
+            background: white;
+            border: none;
+            border-radius: 18px;
+
+            font-size: 48px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+            transition: 0.2s;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+            background: #fff8fa;
+        }
+
+        /* X = Red */
+
+        .cell.x {
+            color: red;
+        }
+
+        /* O = Green */
+
+        .cell.o {
+            color: green;
+        }
+
+        /* Winning cells */
+
+        .cell.winner {
+            animation: winnerAnimation 0.6s infinite alternate;
+        }
+
+        @keyframes winnerAnimation {
+            from {
+                transform: scale(1);
+            }
+
+            to {
+                transform: scale(1.08);
+            }
+        }
+
+        /* Restart Button */
+
+        #restart {
+            margin-top: 25px;
+
+            padding: 13px 28px;
+
+            border: none;
+            border-radius: 25px;
+
+            background: #ff6b81;
+            color: white;
+
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        #restart:hover {
+            background: #ff4757;
+            transform: scale(1.05);
+        }
+
+
+        /* =========================
+           CUTE POPUP
+           ========================= */
+
+        .popup-overlay {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.45);
+
+            display: none;
+
+            justify-content: center;
+            align-items: center;
+
+            z-index: 1000;
+        }
+
+        .popup-box {
+            width: 320px;
+
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 28px;
+
+            text-align: center;
+
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+
+            animation: popupAnimation 0.4s ease;
+        }
+
+        @keyframes popupAnimation {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        #popupEmoji {
+            font-size: 65px;
+
+            margin-bottom: 10px;
+
+            animation: emojiAnimation 1s infinite alternate;
+        }
+
+        @keyframes emojiAnimation {
+            from {
+                transform: rotate(-5deg) scale(1);
+            }
+
+            to {
+                transform: rotate(5deg) scale(1.1);
+            }
+        }
+
+        #popupTitle {
+            font-size: 28px;
+
+            margin-bottom: 10px;
+
+            color: #333;
+        }
+
+        #popupMessage {
+            color: #777;
+
+            font-size: 17px;
+
+            margin-bottom: 22px;
+        }
+
+        .play-again {
+            border: none;
+
+            padding: 12px 25px;
+
+            border-radius: 25px;
+
+            background: #ff6b81;
+
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .play-again:hover {
+            background: #ff4757;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <h1>💕 Zero Kati 💕</h1>
+
+        <p class="subtitle">Let's play and have fun! 🎮</p>
+
+        <div id="status">
+            Player X's Turn
+        </div>
+
+
+        <!-- Game Board -->
+
+        <div class="game">
+
+            <button class="cell" onclick="play(0)"></button>
+            <button class="cell" onclick="play(1)"></button>
+            <button class="cell" onclick="play(2)"></button>
+
+            <button class="cell" onclick="play(3)"></button>
+            <button class="cell" onclick="play(4)"></button>
+            <button class="cell" onclick="play(5)"></button>
+
+            <button class="cell" onclick="play(6)"></button>
+            <button class="cell" onclick="play(7)"></button>
+            <button class="cell" onclick="play(8)"></button>
+
+        </div>
+
+
+        <button id="restart" onclick="restartGame()">
+            🔄 Restart Game
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         CUTE POPUP
+         ========================= -->
+
+    <div id="popup" class="popup-overlay">
+
+        <div class="popup-box">
+
+            <div id="popupEmoji">
+                🎉
+            </div>
+
+            <h2 id="popupTitle">
+                Player X Wins!
+            </h2>
+
+            <p id="popupMessage">
+                You played amazingly! 🥳
+            </p>
+
+            <button class="play-again" onclick="restartGame()">
+                💖 Play Again
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =========================
+           GAME VARIABLES
+           ========================= */
+
+        let board = [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ];
+
+        let currentPlayer = "X";
+
+        let gameOver = false;
+
+
+        const cells = document.querySelectorAll(".cell");
+
+        const status = document.getElementById("status");
+
+
+        /* =========================
+           WINNING PATTERNS
+           ========================= */
+
+        const winningPatterns = [
+
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+
+            [0, 4, 8],
+            [2, 4, 6]
+
+        ];
+
+
+        /* =========================
+           PLAY FUNCTION
+           ========================= */
+
+        function play(index) {
+
+            // Agar game already over hai
+            if (gameOver) {
+                return;
+            }
+
+
+            // Agar box already filled hai
+            if (board[index] !== "") {
+                return;
+            }
+
+
+            // X ya O board mein add karo
+
+            board[index] = currentPlayer;
+
+            cells[index].textContent = currentPlayer;
+
+
+            /* =========================
+               PLAYER COLORS
+               ========================= */
+
+            if (currentPlayer === "X") {
+
+                cells[index].classList.add("x");
+
+            } else {
+
+                cells[index].classList.add("o");
+
+            }
+
+
+            /* =========================
+               WINNER CHECK
+               ========================= */
+
+            const winningCombination = checkWinner();
+
+
+            if (winningCombination) {
+
+                gameOver = true;
+
+
+                // Winning boxes highlight
+
+                winningCombination.forEach(function(position) {
+
+                    cells[position].classList.add("winner");
+
+                });
+
+
+                status.textContent =
+                    "🎉 Player " + currentPlayer + " Wins!";
+
+
+                if (currentPlayer === "X") {
+
+                    showPopup(
+                        "❤️",
+                        "Player X Wins!",
+                        "Yay! X played amazingly! 🥳"
+                    );
+
+                } else {
+
+                    showPopup(
+                        "💚",
+                        "Player O Wins!",
+                        "Yay! O played amazingly! 🥳"
+                    );
+
+                }
+
+
+                return;
+            }
+
+
+            /* =========================
+               DRAW CHECK
+               ========================= */
+
+            if (!board.includes("")) {
+
+                gameOver = true;
+
+                status.textContent = "🤝 Game Draw!";
+
+
+                showPopup(
+                    "🥰",
+                    "It's a Draw!",
+                    "Aww! Both players played great! 💕"
+                );
+
+
+                return;
+            }
+
+
+            /* =========================
+               CHANGE PLAYER
+               ========================= */
+
+            if (currentPlayer === "X") {
+
+                currentPlayer = "O";
+
+            } else {
+
+                currentPlayer = "X";
+
+            }
+
+
+            status.textContent =
+                "Player " + currentPlayer + "'s Turn";
+
+        }
+
+
+        /* =========================
+           CHECK WINNER
+           ========================= */
+
+        function checkWinner() {
+
+            for (let pattern of winningPatterns) {
+
+                let a = pattern[0];
+
+                let b = pattern[1];
+
+                let c = pattern[2];
+
+
+                if (
+                    board[a] !== "" &&
+                    board[a] === board[b] &&
+                    board[b] === board[c]
+                ) {
+
+                    return pattern;
+
+                }
+
+            }
+
+
+            return null;
+        }
+
+
+        /* =========================
+           SHOW POPUP
+           ========================= */
+
+        function showPopup(emoji, title, message) {
+
+            document.getElementById("popupEmoji").textContent =
+                emoji;
+
+            document.getElementById("popupTitle").textContent =
+                title;
+
+            document.getElementById("popupMessage").textContent =
+                message;
+
+
+            document.getElementById("popup").style.display =
+                "flex";
+
+        }
+
+
+        /* =========================
+           RESTART GAME
+           ========================= */
+
+        function restartGame() {
+
+            board = [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ];
+
+
+            currentPlayer = "X";
+
+            gameOver = false;
+
+
+            cells.forEach(function(cell) {
+
+                cell.textContent = "";
+
+                cell.classList.remove("x");
+
+                cell.classList.remove("o");
+
+                cell.classList.remove("winner");
+
+            });
+
+
+            status.textContent =
+                "Player X's Turn";
+
+
+            // Popup hide karo
+
+            document.getElementById("popup").style.display =
+                "none";
+
+        }
+
+    </script>
+
+</body>
+
+</html>
